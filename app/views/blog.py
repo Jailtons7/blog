@@ -1,6 +1,6 @@
 from flask import request, jsonify
 
-from app import db
+from app import file_upload
 from app.models.blog import Posts
 from app.serializers.blog import post_schema
 
@@ -22,9 +22,9 @@ def create_post(**kwargs):
     if not all(data.values()):
         return jsonify(
             {
-                "Error": "Please provide data under a form-data object to make a Post.",
-                "Required fields": ["text"],
-                "Optional fields": ["image"]
+                "message": "Please provide data under a form-data object to make a Post.",
+                "required_fields": ["text"],
+                "optional_fields": ["image"]
             }
         ), 400
     try:
@@ -34,7 +34,7 @@ def create_post(**kwargs):
     except Exception as e:
         print(e)
         return jsonify(
-            {"Error": "Something went wrong, please, contact the site administration"}
+            {"message": "Something went wrong, please, contact the site administration"}
         ), 500
 
     return jsonify(
@@ -45,13 +45,20 @@ def create_post(**kwargs):
     ), 201
 
 
-def delete_post(pk, **kwargs):
+def delete_post(pk: int, **kwargs) -> tuple:
+    """
+    delete a post with the primary key passed as first argument.
+    it also deletes image from the media folder, keeping database and static media servers sync.
+
+    :param pk: the post primary key
+    :param kwargs:
+    :return: a tuple with jsonify object and the status code
+    """
     post = Posts.query.get(pk)
     if post is None:
         return jsonify({"message": "Post not found", "data": {}}), 404
 
     if kwargs["user"].id == post.user_id:
-        db.session.query(Posts).filter(Posts.id == post.id).delete()
-        db.session.commit()
+        file_upload.delete_files(post, files=["image"])
         return jsonify({"message": "Post Successfully deleted", "data": {}}), 204
     return jsonify({"message": "Permission denied"}), 403
