@@ -92,3 +92,15 @@ def post_comment(**kwargs):
             {"message": "Something went wrong, please, contact the site administration"}
         ), 500
     return jsonify({"message": "Comment created successfully", "data": data}), 200
+
+
+def delete_comment(pk, **kwargs):
+    comment = Comments.query.get(pk)
+    if comment is None:
+        return jsonify({"message": "Comment not found", "data": {}}), 404
+
+    if kwargs["user"].id == comment.id:
+        db.session.delete(comment)
+        db.session.commit()
+        return jsonify({"message": "Comment Successfully deleted", "data": {}}), 204
+    return jsonify({"message": "Permission denied"}), 403

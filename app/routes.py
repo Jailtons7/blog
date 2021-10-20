@@ -41,3 +41,9 @@ def delete_post(pk, **kwargs):
 @authentication.token_required
 def post_comment(**kwargs):
     return blog.post_comment(**kwargs)
+
+
+@app.delete("/comments/<int:pk>")
+@authentication.token_required
+def delete_comment(pk, **kwargs):
+    return blog.delete_comment(pk, **kwargs)
