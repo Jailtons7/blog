@@ -42,6 +42,11 @@ class Comments(db.Model):
     post = db.relationship("Posts", foreign_keys="Comments.post_id")
     user = db.relationship("Users", foreign_keys="Comments.user_id")
 
+    def __init__(self, user_id: int, text: str, post_id: int):
+        self.user_id = user_id
+        self.text = text
+        self.post_id = post_id
+
 
 class Albums(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
