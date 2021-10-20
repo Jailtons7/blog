@@ -34,11 +34,13 @@ class Posts(db.Model):
 
 class Comments(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     text = db.Column(db.Text(), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
     created_at = db.Column(db.DateTime, default=datetime.now())
 
     post = db.relationship("Posts", foreign_keys="Comments.post_id")
+    user = db.relationship("Users", foreign_keys="Comments.user_id")
 
 
 class Albums(db.Model):
