@@ -1,8 +1,8 @@
 from flask import request, jsonify
 
-from app import file_upload
-from app.models.blog import Posts
-from app.serializers.blog import post_schema
+from app import db, file_upload
+from app.models.blog import Posts, Comments
+from app.serializers.blog import post_schema, comment_schema
 
 
 def create_post(**kwargs):
@@ -62,3 +62,33 @@ def delete_post(pk: int, **kwargs) -> tuple:
         file_upload.delete_files(post, files=["image"])
         return jsonify({"message": "Post Successfully deleted", "data": {}}), 204
     return jsonify({"message": "Permission denied"}), 403
+
+
+def post_comment(**kwargs):
+    data = {
+        "post_id": request.json and request.json.get("post_id"),
+        "text": request.json and request.json.get("text"),
+        "user_id": kwargs["user"].id,
+    }
+    if not all(data.values()):
+        return jsonify({
+            "message": "Please provide data under a json object to make a comment.",
+            "required_fields": ["text", "post_id"],
+            "optional_fields": []
+        }), 400
+
+    post = Posts.query.get(data['post_id'])
+    if post is None:
+        return jsonify({"message": "impossible to comment a inexistent post", "data": {}}), 400
+
+    try:
+        comment = Comments(**data)
+        db.session.add(comment)
+        db.session.commit()
+        data = comment_schema.dump(comment)
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {"message": "Something went wrong, please, contact the site administration"}
+        ), 500
+    return jsonify({"message": "Comment created successfully", "data": data}), 200
