@@ -11,7 +11,8 @@ class Posts(db.Model):
     Defines the attributes of posts table in the database
     """
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    body = db.Column(db.Text())
+    title = db.Column(db.String(), nullable=False)
+    body = db.Column(db.Text(), nullable=False)
     image = file_upload.Column()
     created_at = db.Column(db.DateTime, default=datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
