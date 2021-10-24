@@ -20,8 +20,13 @@ class Posts(db.Model):
 
     user = db.relationship("Users", foreign_keys="Posts.user_id")
 
-    def __init__(self, text: str, user_id: int, image: Optional[str] = None):
-        self.text = text
+    def __init__(
+            self, title: str, user_id: int, resume: str, body: str,
+            image: Optional[str] = None,
+    ):
+        self.title = title
+        self.resume = resume
+        self.body = body
         self.user_id = user_id
         self.image = image
 

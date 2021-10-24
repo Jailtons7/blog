@@ -3,7 +3,7 @@ from app import ma
 
 class PostsSchema(ma.Schema):
     class Meta:
-        fields = ("id", "text", "image__ext", "image__file_name", "created_at", "user_id")
+        fields = ("id", "title", "resume", "body", "image__ext", "image__file_name", "created_at", "user_id")
 
 
 class CommentsSchema(ma.Schema):
